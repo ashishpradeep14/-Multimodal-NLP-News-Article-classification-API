@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Classifier Deployment</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2c2e30;
+            --primary-hover: #071a4c;
+            --text-dark: #5e1b05; 
+            --radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            /* Background is 100% visible, no blur, no overlay */
+            background-image: url('https://images.unsplash.com/photo-1504711434969-e33886168f5c?q=80&w=2070&auto=format&fit=crop'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-dark);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            border-radius: var(--radius);
+            
+            /* --- FULLY TRANSPARENT CONTAINER --- */
+            background: none; 
+            backdrop-filter: none;
+            box-shadow: none;
+            border: none;
+            
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        /* --- TEXT READABILITY SOLUTION (White Outline) --- */
+        .readable-text {
+            /* Strong white outline applied to make text legible over background details */
+            text-shadow: 
+                -1px -1px 0 #ebdada,  
+                 1px -1px 0 #e1d3d3,
+                -1px  1px 0 #cfc0c0,
+                 1px  1px 0 #FFF,
+                 0 0 8px rgba(0,0,0,0.2); 
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 900; 
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-dark);
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            font-size: 1rem;
+            /* --- FULLY TRANSPARENT INPUT FIELD --- */
+            background: none; 
+            border: 2px solid var(--text-dark); /* Added a border to define the input area */
+            border-radius: 12px;
+            transition: all 0.2s;
+            color: var(--text-dark);
+            font-weight: 600;
+            /* Input placeholder needs the same shadow for readability */
+            text-shadow: -1px -1px 0 #f1ececb5, 1px -1px 0 #FFF, -1px 1px 0 #FFF, 1px 1px 0 #FFF; 
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background-color: rgba(171, 14, 14, 0.1); /* Very subtle highlight on focus */
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(34, 201, 140, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: rgb(5, 233, 20);
+            font-size: 1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(14, 235, 47, 0.3);
+            transition: transform 0.1s, background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Result Section */
+        .result-box {
+            margin-top: 30px;
+            padding: 20px;
+            /* --- FULLY TRANSPARENT RESULT BOX --- */
+            background: none; 
+            border: 2px solid var(--text-dark); /* Added border to define area */
+            border-radius: 12px;
+            box-shadow: none;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .result-box h2 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
+
+        .result-detail p {
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .category-label {
+            background-color: var(--primary-color);
+            color: rgb(5, 5, 5);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header class="readable-text">
+            <h1>News Classification AI</h1>
+            <p>Analyze headlines with machine learning</p>
+        </header>
+
+        <form action="/predict" method="post">
+            <div class="form-group readable-text">
+                <label for="headline-input">Headline</label>
+                <input 
+                    type="text" 
+                    id="headline-input" 
+                    name="headline" 
+                    placeholder="Enter a news headline here..." 
+                    required
+                    autocomplete="off"
+                >
+            </div>
+            <button type="submit">Analyze Text</button>
+        </form>
+
+    
+            <div class="result-box readable-text">
+                <h2>Results</h2>
+                <div class="result-detail">
+                    <p><strong>Input:</strong> result.input_headline </p>
+                    <p><strong>Category:</strong> <span class="category-label">result.predicted_category</span></p>
+                    <p><strong>Confidence:</strong> result.confidence </p>
+                </div>
+            </div>
+    
+
+    </div>
+
+</body>
+</html>
